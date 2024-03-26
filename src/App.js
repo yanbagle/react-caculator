@@ -5,9 +5,12 @@ import Button from "./components/button";
 import Row from "./components/row";
 
 function App() {
-  const [total, setTotal] = useState(0);
-  const [input, setInputStack] = useState([]);
+  const [display, setDisplay] = useState(0);
+  const [total, setTotal] = useState(null);
+  const [currentInput, setCurrentInput] = useState([]);
   const [operator, setOperator] = useState(null);
+  const [hasPreviouslySetOperator, setHasPreviouslySetOperator] =
+    useState(false);
   const inputSizeLimit = 9;
 
   const btnValues = [
@@ -19,25 +22,65 @@ function App() {
   ];
 
   const inputClick = (btnValue) => {
-    if (input.length >= inputSizeLimit && typeof btnValue === "number") {
+    if (display.length >= inputSizeLimit && typeof btnValue === "number") {
       return;
     }
-    if (typeof btnValue === "string") {
-      setOperator(btnValue);
-    }
-    if (operator) {
-      setTotal(+input.join(''));
-    }
-    if (typeof btnValue === "number") {
-      if () {
-        
+
+    if (btnValue === "C") {
+      reset();
+    } else if (typeof btnValue === "number") {
+      const inputArr = [...currentInput, btnValue];
+      setCurrentInput(inputArr);
+      setDisplay(+inputArr.join(""));
+      setHasPreviouslySetOperator(false);
+    } else if (typeof btnValue === "string") {
+      if (hasPreviouslySetOperator) {
+        setOperator(btnValue);
+        return;
       }
+      const runningTotal = doMath(total, +currentInput.join(""), btnValue);
+      console.log("runningTotal ", runningTotal);
+      setTotal(runningTotal);
+      setDisplay(runningTotal);
+      setCurrentInput([]);
+      setOperator(btnValue);
+      setHasPreviouslySetOperator(true);
     }
-    // setInputStack([...input, btnValue]);
-    // setTotal(btnValue);
   };
 
-  const doMath = () => {};
+  const doMath = (num1, num2, currentOperator) => {
+    console.log("num1 ", num1);
+    console.log("num2 ", num2);
+    console.log("currentOperator ", currentOperator);
+
+    if (currentOperator === "+") {
+      return num1 + num2;
+    } else if (currentOperator === "-") {
+      if (num1 === null) {
+        return num2;
+      }
+      return num1 - num2;
+    } else if (currentOperator === "X") {
+      if (num1 === null) {
+        num1 = 1;
+      }
+      return num1 * num2;
+    } else if (currentOperator === "/") {
+      if (num1 === null) {
+        return num2;
+      }
+      return num1 / num2;
+    } else if (currentOperator === "=") {
+      return doMath(num1, num2, operator);
+    }
+  };
+
+  const reset = () => {
+    setCurrentInput([]);
+    setDisplay(0);
+    setOperator(null);
+    setTotal(null);
+  };
 
   const renderBtnRow = () => {
     return btnValues.map((btnValue, index) => (
@@ -58,7 +101,7 @@ function App() {
   return (
     <div className="flex justify-center">
       <div className="w-[34rem] h-[41rem] border-double border-2 border-indigo-700 rounded px-2 py-2 [&>*]:py-1 bg-indigo-200">
-        <InputDisplay total={input}></InputDisplay>
+        <InputDisplay total={display}></InputDisplay>
         {renderBtnRow()}
       </div>
     </div>
