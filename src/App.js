@@ -28,6 +28,21 @@ function App() {
 
     if (btnValue === "C") {
       reset();
+    } else if (btnValue === "+-") {
+      const currNum = +currentInput.join("");
+      if (currNum > 0) {
+        const neg = Math.abs(currNum) * -1;
+        setCurrentInput([neg]);
+        setDisplay(neg);
+      } else {
+        const pos = Math.abs(currNum);
+        setCurrentInput([pos]);
+        setDisplay(pos);
+      }
+    } else if (btnValue === "%") {
+      const percentage = +currentInput.join("") / 100;
+      setCurrentInput([percentage]);
+      setDisplay(percentage);
     } else if (typeof btnValue === "number") {
       const inputArr = [...currentInput, btnValue];
       setCurrentInput(inputArr);
@@ -39,7 +54,6 @@ function App() {
         return;
       }
       const runningTotal = doMath(total, +currentInput.join(""), btnValue);
-      console.log("runningTotal ", runningTotal);
       setTotal(runningTotal);
       setDisplay(runningTotal);
       setCurrentInput([]);
@@ -49,10 +63,6 @@ function App() {
   };
 
   const doMath = (num1, num2, currentOperator) => {
-    console.log("num1 ", num1);
-    console.log("num2 ", num2);
-    console.log("currentOperator ", currentOperator);
-
     if (currentOperator === "+") {
       return num1 + num2;
     } else if (currentOperator === "-") {
